@@ -32,16 +32,17 @@ std::ostream & operator << (std::ostream &out, const Matrix& matrix) {
     return out;
 }
 
-std::vector<int> Matrix::operator*(const Matrix& rhs) {
-    std::vector<int> result;
+Matrix Matrix::operator*(const Matrix& rhs) {
+    size_t xRowCount = this->matrixValues.size();
+    size_t xColumnCount = rhs.matrixValues[0].size();
+    size_t yColumnCount = rhs.matrixValues.size();
+    Matrix result = Matrix(xRowCount, yColumnCount, 0);
 
-    for (unsigned r = 0; r < this->matrixValues.size(); r++) {
-        for (unsigned c = 0; c < rhs.matrixValues[r].size(); c++) {
-            int sum = 0;
-            for (unsigned i = 0; i < this->matrixValues[r].size(); i++) {
-                sum += this->matrixValues[r][i] * rhs.matrixValues[i][c];
+    for (unsigned r = 0; r < xRowCount; r++) {
+        for (unsigned c = 0; c < yColumnCount; c++) {
+            for (unsigned i = 0; i < xColumnCount; i++) {
+                result.matrixValues[r][c] += this->matrixValues[r][i] * rhs.matrixValues[i][c];
             }
-            result.push_back(sum);
         }
     }
 
@@ -89,4 +90,26 @@ Matrix generateRandomMatrix(unsigned rowCount, unsigned columnCount) {
     }
 
     return {rowCount, columnCount, matrixValues};
+}
+
+std::vector<Matrix>* generateRandomMatrices(unsigned matrixCount, int minDimension, int maxDimension) {
+    std::vector<Matrix>* matrices = new std::vector<Matrix> [matrixCount];
+
+    std::random_device rd;
+    std::mt19937 mt(rd());
+    std::uniform_int_distribution<int> dist;
+
+    if (minDimension <= 0 || maxDimension <= 0 || minDimension > maxDimension) {
+        return matrices;
+    }
+
+    dist = std::uniform_int_distribution<int>(minDimension, maxDimension);
+
+    for (int i = 0; i < matrixCount; i++) {
+        int rowCount = dist(mt);
+        int columnCount = dist(mt);
+        matrices->push_back(generateRandomMatrix(rowCount, columnCount));
+    }
+
+    return matrices;
 }

@@ -22,11 +22,13 @@ public:
 
     // Operators
     friend std::ostream & operator << (std::ostream &out, const Matrix& matrix);
-    std::vector<int> operator*(const Matrix& rhs);
+    Matrix operator*(const Matrix& rhs);
     Matrix& operator=(const Matrix& matrix);
     bool operator==(const Matrix& rhs);
 };
 
 Matrix generateRandomMatrix(unsigned rowCount, unsigned columnCount);
+
+std::vector<Matrix>* generateRandomMatrices(unsigned matrixCount, int minDimension, int maxDimension);
 
 #endif //TESTER_HW2_MATRIX_H
