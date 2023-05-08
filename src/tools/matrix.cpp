@@ -74,42 +74,43 @@ bool Matrix::operator==(const Matrix& rhs) {
     return true;
 }
 
-Matrix generateRandomMatrix(unsigned rowCount, unsigned columnCount) {
-    MatrixVector matrixValues;
+MatrixGroup generateRandomMatrixGroup(unsigned rowCount, unsigned columnCount) {
+    MatrixGroup matrixGroup;
 
     std::random_device rd;
     std::mt19937 mt(rd());
     std::uniform_int_distribution<int> dist(0, 100);
 
-    for (int r = 0; r < rowCount; r++) {
-        std::vector<int> rowValues;
-        for (int c = 0; c < columnCount; c++) {
-            rowValues.push_back(dist(mt));
+    for (int n = 0; n < 4; n++) {
+        MatrixVector matrixValues;
+
+        for (int r = 0; r < rowCount; r++) {
+            std::vector<int> rowValues;
+            for (int c = 0; c < columnCount; c++) {
+                rowValues.push_back(dist(mt));
+            }
+            matrixValues.push_back(rowValues);
         }
-        matrixValues.push_back(rowValues);
+
+        matrixGroup.values[n] = Matrix(rowCount, columnCount, matrixValues);
     }
 
-    return {rowCount, columnCount, matrixValues};
+    return matrixGroup;
 }
 
-std::vector<Matrix>* generateRandomMatrices(unsigned matrixCount, int minDimension, int maxDimension) {
-    std::vector<Matrix>* matrices = new std::vector<Matrix> [matrixCount];
+std::vector<MatrixGroup>* generateRandomMatrixGroups(unsigned matrixGroupCount, int minDimension, int maxDimension) {
+    std::vector<MatrixGroup>* matrixGroups = new std::vector<MatrixGroup>();
 
     std::random_device rd;
     std::mt19937 mt(rd());
-    std::uniform_int_distribution<int> dist;
+    std::uniform_int_distribution<int> dist(minDimension, maxDimension);
 
-    if (minDimension <= 0 || maxDimension <= 0 || minDimension > maxDimension) {
-        return matrices;
-    }
-
-    dist = std::uniform_int_distribution<int>(minDimension, maxDimension);
-
-    for (int i = 0; i < matrixCount; i++) {
+    for (int n = 0; n < matrixGroupCount; n++) {
         int rowCount = dist(mt);
         int columnCount = dist(mt);
-        matrices->push_back(generateRandomMatrix(rowCount, columnCount));
+
+        matrixGroups->push_back(generateRandomMatrixGroup(rowCount, columnCount));
     }
 
-    return matrices;
+    return matrixGroups;
 }

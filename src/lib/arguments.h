@@ -13,7 +13,7 @@
 #define MAX_DIMENSION 10
 
 struct Arguments {
-    int matrixCount;
+    int matrixGroupCount;
     int minDimension;
     int maxDimension;
 };

@@ -27,8 +27,12 @@ public:
     bool operator==(const Matrix& rhs);
 };
 
-Matrix generateRandomMatrix(unsigned rowCount, unsigned columnCount);
+typedef struct {
+    Matrix values [4];
+} MatrixGroup;
 
-std::vector<Matrix>* generateRandomMatrices(unsigned matrixCount, int minDimension, int maxDimension);
+MatrixGroup generateRandomMatrixGroup(unsigned rowCount, unsigned columnCount);
+
+std::vector<MatrixGroup>* generateRandomMatrixGroups(unsigned matrixGroupCount, int minDimension, int maxDimension);
 
 #endif //TESTER_HW2_MATRIX_H
