@@ -98,11 +98,7 @@ void TesterModule::run() {
                 write(fd[1], matrixGroups->at(i).values[j].toString().c_str(), matrixGroups->at(i).values[j].toString().length());
             }
 
-            while(waitpid(pid, &status, WNOHANG) == 0) {
-                sleep(5);
-                std::cout << "Timeout reached." << std::endl;
-                kill(pid, SIGKILL);
-            }
+            waitpid(pid, &status, 0);
 
             if (!WIFEXITED(status)) {
                 std::cerr << "Child process exited abnormally." << std::endl;
@@ -111,6 +107,7 @@ void TesterModule::run() {
                 this->logResult(MATCHING_OUTPUTS, false);
                 this->logResult(FINAL_MATRIX, false);
                 this->logResult(THREAD_COUNT, false);
+                std::cout << "----------------------------------------" << std::endl;
                 continue;
             }
 
@@ -131,6 +128,10 @@ void TesterModule::run() {
 
             while (!feof(outputFile) && row < finalRow) {
                 char line[64];
+
+                // DEBUG
+                std::cout << "Reading line " << row << std::endl;
+                // DEBUG
 
                 fgets(line, 64, outputFile);
 
