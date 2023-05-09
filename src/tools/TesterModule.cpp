@@ -45,7 +45,7 @@ void TesterModule::run() {
     std::cout << "Tester started." << std::endl;
 
     for (int i = 0; i < arguments.matrixGroupCount; i++) {
-        char outputPath[16];
+        char outputPath[24];
         pid_t pid;
         int fd[2];
 

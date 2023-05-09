@@ -9,9 +9,12 @@
 #include "../lib/arguments.h"
 #include "../lib/Fork.h"
 
+#include <cstring>
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/fcntl.h>
+#include <sys/wait.h>
+#include <limits>
 
 #define SUM_TEST_1 "SUM OF MATRICES A&B"
 #define SUM_TEST_2 "SUM OF MATRICES C&D"
