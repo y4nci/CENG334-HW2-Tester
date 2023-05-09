@@ -6,9 +6,9 @@
 
 Arguments parseArguments(int argc, char** argv) {
     Arguments arguments = {
-            .matrixGroupCount = MATRIX_COUNT,
-            .minDimension = MIN_DIMENSION,
-            .maxDimension = MAX_DIMENSION
+            MATRIX_COUNT,
+            MIN_DIMENSION,
+            MAX_DIMENSION
     };
 
     if (argc == 1) {
