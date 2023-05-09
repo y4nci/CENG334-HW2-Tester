@@ -16,6 +16,7 @@
 #include <sys/wait.h>
 #include <climits>
 #include <regex>
+#include <set>
 
 #define SUM_TEST_1 "SUM OF MATRICES A&B"
 #define SUM_TEST_2 "SUM OF MATRICES C&D"

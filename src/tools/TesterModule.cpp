@@ -15,6 +15,8 @@ TesterModule::TesterModule(Arguments arguments) {
 
 TesterModule::~TesterModule() {
     delete this->matrixGroups;
+
+    system("rm -f logs/output*.txt");
 }
 
 void TesterModule::confirmExecutable(const char* executablePath) {
@@ -71,7 +73,7 @@ void TesterModule::run() {
         } else if (pid > 0) {
             // Parent process
 
-            int status, threadLines = 0, lastMatrixId = INT_MIN, row = 0;
+            int status, lastMatrixId = INT_MIN, row = 0;
             unsigned finalRow = matrixGroups->at(i).values[0].getMatrixValues().size()
                     , finalColumn = matrixGroups->at(i).values[3].getMatrixValues()[0].size()
                     , N = finalRow, K = finalColumn, M = matrixGroups->at(i).values[0].getMatrixValues()[0].size();
@@ -85,6 +87,7 @@ void TesterModule::run() {
                      * whereas actualFinal_output is a matrix containing the values it read from the end of the output file.
                      */
                     , actualFinal_cellByCell(N, K, 0), actualFinal_output(N, K, 0);
+            std::vector<std::string> threadIds;
 
             close(fd[0]);
 
@@ -147,7 +150,7 @@ void TesterModule::run() {
                         lastMatrixId = matrixId;
                     }
 
-                    threadLines++;
+                    threadIds.push_back(id);
                 } else {
                     // parse final matrix
                     // row by row
@@ -162,23 +165,25 @@ void TesterModule::run() {
                 }
             }
 
-            std::cout << "Matrix group " << i << " is tested." << std::endl;
+            std::cout << "\nMatrix group " << i+1 << " is tested.\n" << std::endl;
 
             this->logResult(SUM_TEST_1, actualSum12 == expectedSum12);
             this->logResult(SUM_TEST_2, actualSum34 == expectedSum34);
             this->logResult(MATCHING_OUTPUTS, actualFinal_cellByCell == actualFinal_output);
             this->logResult(FINAL_MATRIX, actualFinal_output == expectedFinal);
 
-            this->logResult(THREAD_COUNT, threadLines == 2 * N + M);
+            this->logResult(THREAD_COUNT, std::set<std::string>( threadIds.begin(), threadIds.end() ).size() == 2 * N + M);
+
+            std::cout << "----------------------------------------" << std::endl;
 
             fclose(outputFile);
-            system("rm -f logs/output*.txt");
         } else {
             std::cerr << "Fork failed." << std::endl;
             exit(1);
         }
     }
 
+    std::cout << "\nThe test process is finished." << std::endl;
     this->logResult(SUM_THREAD_SYNCHRONISATION, this->sumSyncDetected);
     this->logResult(MUL_THREAD_SYNCHRONISATION, this->mulSyncDetected);
 }
