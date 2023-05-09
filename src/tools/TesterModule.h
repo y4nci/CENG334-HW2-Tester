@@ -7,6 +7,7 @@
 
 #include "matrix.h"
 #include "../lib/arguments.h"
+#include "../lib/Fork.h"
 
 #include <unistd.h>
 #include <sys/stat.h>

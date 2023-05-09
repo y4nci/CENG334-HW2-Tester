@@ -46,7 +46,7 @@ void TesterModule::run() {
 
     for (int i = 0; i < arguments.matrixGroupCount; i++) {
         char outputPath[16];
-        pid_t pid = fork();
+        pid_t pid = Fork();
         int fd[2];
 
         snprintf(outputPath, 16, "./logs/output%d.txt", i);
