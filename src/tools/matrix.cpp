@@ -101,7 +101,7 @@ MatrixGroup generateRandomMatrixGroup(unsigned rowCount, unsigned columnCount) {
 
     std::random_device rd;
     std::mt19937 mt(rd());
-    std::uniform_int_distribution<int> dist(0, 100);
+    std::uniform_int_distribution<int> dist(0, 10);
 
     for (int n = 0; n < 4; n++) {
         MatrixVector matrixValues;

@@ -46,14 +46,16 @@ void TesterModule::run() {
 
     for (int i = 0; i < arguments.matrixGroupCount; i++) {
         char outputPath[16];
-        pid_t pid = Fork();
+        pid_t pid;
         int fd[2];
 
-        snprintf(outputPath, 16, "./logs/output%d.txt", i);
+        snprintf(outputPath, 24, "logs/output%d.txt", i);
 
         // DEBUG
 
         pipe(fd);
+
+        pid = Fork();
 
         if (pid == 0) {
             // Child process
@@ -83,8 +85,8 @@ void TesterModule::run() {
             close(fd[0]);
 
             for (int j = 0; j < 4; j++) {
-                std::cout << "Input matrix " << j << " for case #\n";
-                std::cout << i << matrixGroups->at(i).values[j].toString() << std::endl;
+                std::cout << "Input matrix " << j+1 << " for case #" << i << "\n";
+                std::cout << matrixGroups->at(i).values[j].toString() << std::endl;
                 write(fd[1], matrixGroups->at(i).values[j].toString().c_str(), matrixGroups->at(i).values[j].toString().length());
             }
 
