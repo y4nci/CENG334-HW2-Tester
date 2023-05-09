@@ -6,7 +6,7 @@
 #include "tools/TesterModule.h"
 
 #include <iostream>
-#include <sys/fcntl.h>
+#include <signal.h>
 
 char executablePath[] = "./hw2";
 char infoMsg[] = "This is not an official tester, and the result produced by this tester is not guaranteed to be correct.\n" \
@@ -27,9 +27,20 @@ char infoMsg[] = "This is not an official tester, and the result produced by thi
                             "\t\t- Detecting concurrent additions of A&B and C&D\n"
                             "\t\t- Detecting concurrent multiplication and addition\n";
 
+void segvCatch(int sig, siginfo_t *info, void *context) {
+    std::cout << "Segmentation fault detected. This error may be caused by the tester or the executable." << std::endl;
+    system("killall hw2");
+    exit(1);
+}
+
 int main(int argc, char** argv) {
     Arguments arguments = parseArguments(argc, argv);
     TesterModule testerModule(arguments);
+    struct sigaction action;
+    memset(&action, 0, sizeof(struct sigaction));
+    action.sa_flags = SA_SIGINFO;
+    action.sa_sigaction = segvCatch;
+    sigaction(SIGSEGV, &action, NULL);
 
     std::cout << infoMsg << std::endl;
 
