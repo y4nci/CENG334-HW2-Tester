@@ -99,8 +99,8 @@ void TesterModule::run() {
             }
 
             while(waitpid(pid, &status, WNOHANG) == 0) {
-                sleep(3);
-                std::cout << "DEADLOCK DETECTED. KILLING THE PROCESS..." << std::endl;
+                sleep(5);
+                std::cout << "Timeout reached." << std::endl;
                 kill(pid, SIGKILL);
             }
 
