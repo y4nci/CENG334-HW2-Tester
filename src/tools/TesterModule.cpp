@@ -49,7 +49,7 @@ void TesterModule::run() {
     for (int i = 0; i < arguments.matrixGroupCount; i++) {
         char outputPath[24];
         pid_t pid;
-        int fd[2], outputFile;
+        int fd[2];
 
         snprintf(outputPath, 24, "logs/output%d.txt", i+1);
 
@@ -59,6 +59,7 @@ void TesterModule::run() {
 
         if (pid == 0) {
             // Child process
+            int outputFile;
             outputFile = open(outputPath, O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
 
             close(fd[1]);
