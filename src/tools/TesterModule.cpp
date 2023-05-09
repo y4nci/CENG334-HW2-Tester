@@ -98,12 +98,20 @@ void TesterModule::run() {
                 write(fd[1], matrixGroups->at(i).values[j].toString().c_str(), matrixGroups->at(i).values[j].toString().length());
             }
 
-            waitpid(pid, &status, 0);
+            while(waitpid(pid, &status, WNOHANG) == 0) {
+                sleep(3);
+                std::cout << "DEADLOCK DETECTED. KILLING THE PROCESS..." << std::endl;
+                kill(pid, SIGKILL);
+            }
 
             if (!WIFEXITED(status)) {
                 std::cerr << "Child process exited abnormally." << std::endl;
-                std::cout << "Aborting..." << std::endl;
-                exit(1);
+                this->logResult(SUM_TEST_1, false);
+                this->logResult(SUM_TEST_2, false);
+                this->logResult(MATCHING_OUTPUTS, false);
+                this->logResult(FINAL_MATRIX, false);
+                this->logResult(THREAD_COUNT, false);
+                continue;
             }
 
             outputFile = fopen(outputPath, "r");
@@ -166,12 +174,19 @@ void TesterModule::run() {
                 }
             }
 
-            std::cout << "\nMatrix group " << i+1 << " is tested.\n" << std::endl;
+            std::cout << "\nMatrix group " << i+1 << " is tested.\n\n" << std::endl;
 
+            std::cout << "Expected sum of matrix 1 and 2:\n" << expectedSum12.toString() << std::endl;
+            std::cout << "Actual sum of matrix 1 and 2:\n" << actualSum12.toString() << std::endl;
+            std::cout << "Expected sum of matrix 3 and 4:\n" << expectedSum34.toString() << std::endl;
+            std::cout << "Actual sum of matrix 3 and 4:\n" << actualSum34.toString() << std::endl;
+            std::cout << "Expected final matrix:\n" << expectedFinal.toString() << std::endl;
+            std::cout << "Actual final matrix:\n" << actualFinal_output.toString() << std::endl;
+
+            this->logResult(FINAL_MATRIX, actualFinal_output == expectedFinal);
             this->logResult(SUM_TEST_1, actualSum12 == expectedSum12);
             this->logResult(SUM_TEST_2, actualSum34 == expectedSum34);
             this->logResult(MATCHING_OUTPUTS, actualFinal_cellByCell == actualFinal_output);
-            this->logResult(FINAL_MATRIX, actualFinal_output == expectedFinal);
 
             this->logResult(THREAD_COUNT, std::set<std::string>( threadIds.begin(), threadIds.end() ).size() == 2 * N + M);
 
