@@ -15,6 +15,7 @@
 #include <sys/fcntl.h>
 #include <sys/wait.h>
 #include <climits>
+#include <regex>
 
 #define SUM_TEST_1 "SUM OF MATRICES A&B"
 #define SUM_TEST_2 "SUM OF MATRICES C&D"
@@ -39,6 +40,7 @@ public:
     void confirmExecutable(const char* executablePath);
     void run();
     void logResult(const char* title, bool passed);
+    bool parseThreadString(const char* str, int& t, char* id, int& matrix_id, int& x, int& y, int& value);
 };
 
 #endif //TESTER_HW2_TESTERMODULE_H

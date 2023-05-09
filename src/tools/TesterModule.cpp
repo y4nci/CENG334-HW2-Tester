@@ -47,7 +47,7 @@ void TesterModule::run() {
     for (int i = 0; i < arguments.matrixGroupCount; i++) {
         char outputPath[24];
         pid_t pid;
-        int fd[2];
+        int fd[2], outputFile;
 
         snprintf(outputPath, 24, "logs/output%d.txt", i+1);
 
@@ -57,7 +57,7 @@ void TesterModule::run() {
 
         if (pid == 0) {
             // Child process
-            int outputFile = open(outputPath, O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
+            outputFile = open(outputPath, O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
 
             close(fd[1]);
 
@@ -71,7 +71,7 @@ void TesterModule::run() {
         } else if (pid > 0) {
             // Parent process
 
-            int status, threadLines = 0, lastMatrixId = INT_MIN;
+            int status, threadLines = 0, lastMatrixId = INT_MIN, row = 0;
             unsigned finalRow = matrixGroups->at(i).values[0].getMatrixValues().size()
                     , finalColumn = matrixGroups->at(i).values[3].getMatrixValues()[0].size()
                     , N = finalRow, K = finalColumn, M = matrixGroups->at(i).values[0].getMatrixValues()[0].size();
@@ -79,17 +79,17 @@ void TesterModule::run() {
             Matrix expectedSum12 = matrixGroups->at(i).values[0] + matrixGroups->at(i).values[1]
                     , expectedSum34 = matrixGroups->at(i).values[2] + matrixGroups->at(i).values[3]
                     , expectedFinal = expectedSum12 * expectedSum34
-                    , actualSum12, actualSum34
+                    , actualSum12(N, M, 0), actualSum34(M, K, 0)
 
                     /* actualFinal_cellByCell is a matrix containing the values it read from the outputs of the threads.
                      * whereas actualFinal_output is a matrix containing the values it read from the end of the output file.
                      */
-                    , actualFinal_cellByCell, actualFinal_output;
+                    , actualFinal_cellByCell(N, K, 0), actualFinal_output(N, K, 0);
 
             close(fd[0]);
 
             for (int j = 0; j < 4; j++) {
-                std::cout << "Input matrix " << j+1 << " for case #" << i << "\n";
+                std::cout << "Input matrix " << j+1 << " for case #" << i+1 << "\n";
                 std::cout << matrixGroups->at(i).values[j].toString() << std::endl;
                 write(fd[1], matrixGroups->at(i).values[j].toString().c_str(), matrixGroups->at(i).values[j].toString().length());
             }
@@ -117,23 +117,26 @@ void TesterModule::run() {
             //     t:      time | id                 m. id   (x,y):value
             // the counts of such lines should be equal to the total number of cells in the matrices.
 
-            while (!feof(outputFile)) {
+            while (!feof(outputFile) && row < finalRow) {
                 char line[64];
 
                 fgets(line, 64, outputFile);
 
                 if (line[0] == 't') {
-                    char id[64];
+                    char id[64]; // TODO: use this id to check whether a row is actually computed by the thread that is supposed to compute it.
                     int time, x, y, value, matrixId;
 
-                    sscanf(line, "t: %d | (%s) Matrix%d (%d,%d):%d", &time, id, &matrixId, &x, &y, &value);
+                    if (!parseThreadString(line, time, id, matrixId, x, y, value)) {
+                        std::cerr << "Thread string could not be parsed." << std::endl;
+                        exit(1);
+                    }
 
                     if (matrixId == 0) {
-                        actualSum12[x][y] = value;
+                        actualSum12[x-1][y-1] = value;
                     } else if (matrixId == 1) {
-                        actualSum34[x][y] = value;
+                        actualSum34[x-1][y-1] = value;
                     } else if (matrixId == 2) {
-                        actualFinal_cellByCell[x][y] = value;
+                        actualFinal_cellByCell[x-1][y-1] = value;
                     }
 
                     if (lastMatrixId == 2 && matrixId != 2) {
@@ -149,16 +152,13 @@ void TesterModule::run() {
                     // parse final matrix
                     // row by row
 
-                    for (int row = 0; row < finalRow; row++) {
-                        char rowString[64];
-                        int column = 0;
+                    int column = 0;
 
-                        fgets(rowString, 64, outputFile);
-
-                        for (char *token = strtok(rowString, " "); token != NULL; token = strtok(NULL, " ")) {
-                            actualFinal_output[row][column++] = atoi(token);
-                        }
+                    for (char *token = strtok(line, " "); token != NULL; token = strtok(NULL, " ")) {
+                        actualFinal_output[row][column++] = atoi(token);
                     }
+
+                    row++;
                 }
             }
 
@@ -181,4 +181,24 @@ void TesterModule::run() {
 
     this->logResult(SUM_THREAD_SYNCHRONISATION, this->sumSyncDetected);
     this->logResult(MUL_THREAD_SYNCHRONISATION, this->mulSyncDetected);
+}
+
+bool TesterModule::parseThreadString(const char* str, int &t, char* id, int &matrix_id, int &x, int &y,
+                                     int &value) {
+    // Create a string stream to parse the input string
+    std::regex pattern(R"(t:\s*(\d+)\s*\|\s*\(([^)]+)\)\s*Matrix(\d+)\s*\((\d+),(\d+)\):([0-9]+))");
+    std::string input(str);
+    std::smatch matches;
+
+    if (std::regex_search(input, matches, pattern)) {
+        t = std::stoi(matches[1]);
+        strcpy(id, matches[2].str().c_str());
+        matrix_id = std::stoi(matches[3]);
+        x = std::stoi(matches[4]);
+        y = std::stoi(matches[5]);
+        value = std::stoi(matches[6]);
+        return true;
+    } else {
+        return false;
+    }
 }
