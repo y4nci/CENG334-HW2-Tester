@@ -14,7 +14,7 @@
 #include <sys/stat.h>
 #include <sys/fcntl.h>
 #include <sys/wait.h>
-#include <limits>
+#include <climits>
 
 #define SUM_TEST_1 "SUM OF MATRICES A&B"
 #define SUM_TEST_2 "SUM OF MATRICES C&D"
