@@ -18,9 +18,7 @@ int main(int argc, char** argv) {
 
     std::cout << "Matrices generated." << std::endl;
 
-
-
-    delete [] matrixGroups;
+    testerModule.run();
 
     return 0;
 }
