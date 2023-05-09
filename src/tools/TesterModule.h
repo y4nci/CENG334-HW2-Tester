@@ -1,12 +1,16 @@
 //
-// Created by Baran Yancı on 7.05.2023.
+// Created by Baran Yancı on 9.05.2023.
 //
 
-#ifndef TESTER_HW2_TESTER_OUTPUT_H
-#define TESTER_HW2_TESTER_OUTPUT_H
+#ifndef TESTER_HW2_TESTERMODULE_H
+#define TESTER_HW2_TESTERMODULE_H
 
-#include <iostream>
-#include "tools/matrix.h"
+#include "matrix.h"
+#include "lib/arguments.h"
+
+#include <unistd.h>
+#include <sys/stat.h>
+#include <sys/fcntl.h>
 
 enum class TestResult {
     FAILURE,
@@ -39,6 +43,18 @@ union TestResultData {
     std::pair<int, int> threadOrdering;
 };
 
-void log(TestType testType, TestResult testResult, TestResultData testResultData, int testNumber);
+class TesterModule {
+private:
+    Arguments arguments;
+    std::vector<MatrixGroup>* matrixGroups;
+public:
+    TesterModule();
+    TesterModule(Arguments arguments);
+    ~TesterModule();
 
-#endif //TESTER_HW2_TESTER_OUTPUT_H
+    void initialiseEnvironment();
+    void confirmExecutable(const char* executablePath);
+    void run();
+};
+
+#endif //TESTER_HW2_TESTERMODULE_H

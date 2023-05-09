@@ -20,10 +20,15 @@ public:
     Matrix(unsigned row, unsigned column, MatrixVector values);
     ~Matrix();
 
+    // Getters
+    MatrixVector getMatrixValues() const;
+
     // Operators
     friend std::ostream & operator << (std::ostream &out, const Matrix& matrix);
     Matrix operator*(const Matrix& rhs);
+    Matrix operator+(const Matrix& rhs);
     Matrix& operator=(const Matrix& matrix);
+    std::vector<int>& operator[](int index);
     bool operator==(const Matrix& rhs);
 };
 

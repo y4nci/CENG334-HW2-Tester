@@ -21,6 +21,10 @@ Matrix::~Matrix() {
     this->matrixValues.clear();
 }
 
+MatrixVector Matrix::getMatrixValues() const {
+    return this->matrixValues;
+}
+
 std::ostream & operator << (std::ostream &out, const Matrix& matrix) {
     for (unsigned r = 0; r < matrix.matrixValues.size(); r++) {
         for (unsigned c = 0; c < matrix.matrixValues[r].size(); c++) {
@@ -49,9 +53,27 @@ Matrix Matrix::operator*(const Matrix& rhs) {
     return result;
 }
 
+Matrix Matrix::operator+(const Matrix& rhs) {
+    size_t xRowCount = this->matrixValues.size();
+    size_t xColumnCount = this->matrixValues[0].size();
+    Matrix result = Matrix(xRowCount, xColumnCount, 0);
+
+    for (unsigned r = 0; r < xRowCount; r++) {
+        for (unsigned c = 0; c < xColumnCount; c++) {
+            result.matrixValues[r][c] = this->matrixValues[r][c] + rhs.matrixValues[r][c];
+        }
+    }
+
+    return result;
+}
+
 Matrix& Matrix::operator=(const Matrix& matrix) {
     this->matrixValues = matrix.matrixValues;
     return *this;
+}
+
+std::vector<int>& Matrix::operator[](int index) {
+    return this->matrixValues[index];
 }
 
 bool Matrix::operator==(const Matrix& rhs) {
