@@ -12,3 +12,4 @@ cmake-build-debug/
 *.exe
 
 tester-hw2
+hw2
