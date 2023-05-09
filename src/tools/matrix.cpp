@@ -38,8 +38,8 @@ std::ostream & operator << (std::ostream &out, const Matrix& matrix) {
 
 Matrix Matrix::operator*(const Matrix& rhs) {
     size_t xRowCount = this->matrixValues.size();
-    size_t xColumnCount = rhs.matrixValues[0].size();
-    size_t yColumnCount = rhs.matrixValues.size();
+    size_t xColumnCount = this->matrixValues[0].size();
+    size_t yColumnCount = rhs.matrixValues[0].size();
     Matrix result = Matrix(xRowCount, yColumnCount, 0);
 
     for (unsigned r = 0; r < xRowCount; r++) {
