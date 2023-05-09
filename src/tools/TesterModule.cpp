@@ -129,10 +129,6 @@ void TesterModule::run() {
             while (!feof(outputFile) && row < finalRow) {
                 char line[64];
 
-                // DEBUG
-                std::cout << "Reading line " << row << std::endl;
-                // DEBUG
-
                 fgets(line, 64, outputFile);
 
                 if (line[0] == 't') {
@@ -203,6 +199,16 @@ void TesterModule::run() {
     std::cout << "\nThe test process is finished." << std::endl;
     this->logResult(SUM_THREAD_SYNCHRONISATION, this->sumSyncDetected);
     this->logResult(MUL_THREAD_SYNCHRONISATION, this->mulSyncDetected);
+
+    if (!this->sumSyncDetected || !this->mulSyncDetected) {
+        char infoMsg [] = "\tNote that these two units check whether two instances of additions occured concurrently "
+                          "and addition and multiplication occured concurrently, respectively. Sometimes "
+                          "the results of these test might be `FAILED` but that does not mean your code "
+                          "does not work properly, your code just did not execute additions and multiplication "
+                          "concurrently for some reason, which is the case for small dimensions usually.";
+
+        std::cout << "\n" << infoMsg << std::endl;
+    }
 }
 
 bool TesterModule::parseThreadString(const char* str, int &t, char* id, int &matrix_id, int &x, int &y,
