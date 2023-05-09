@@ -5,9 +5,11 @@
 #include "TesterModule.h"
 
 TesterModule::TesterModule() {
+    std::cout << "TesterModule created." << std::endl;
 }
 
 TesterModule::TesterModule(Arguments arguments) {
+    std::cout << "TesterModule created." << std::endl;
     this->arguments = arguments;
 }
 
@@ -29,6 +31,8 @@ void TesterModule::initialiseEnvironment() {
     this->sumSyncDetected = false;
     this->mulSyncDetected = false;
     this->matrixGroups = generateRandomMatrixGroups(arguments.matrixGroupCount, arguments.minDimension, arguments.maxDimension);
+
+    std::cout << "Environment initialised." << std::endl;
 }
 
 void TesterModule::logResult(const char* title, bool passed) {
@@ -38,16 +42,25 @@ void TesterModule::logResult(const char* title, bool passed) {
 void TesterModule::run() {
     const char executablePath[] = "./hw2";
 
+    std::cout << "Tester started." << std::endl;
+
     for (int i = 0; i < arguments.matrixGroupCount; i++) {
         char outputPath[16];
         pid_t pid = fork();
+        int fd[2];
 
         snprintf(outputPath, 16, "./logs/output%d.txt", i);
+
+        // DEBUG
+
+        pipe(fd);
 
         if (pid == 0) {
             // Child process
 
+            close(fd[1]);
             dup2(open(outputPath, O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU), STDOUT_FILENO);
+            dup2(fd[0], STDIN_FILENO);
             execl(executablePath, executablePath, NULL);
         } else if (pid > 0) {
             // Parent process
@@ -67,11 +80,17 @@ void TesterModule::run() {
                      */
                     , actualFinal_cellByCell, actualFinal_output;
 
+            close(fd[0]);
+
+            for (int j = 0; j < 4; j++) {
+                std::cout << "Input matrix " << j << " for case #\n";
+                std::cout << i << matrixGroups->at(i).values[j].toString() << std::endl;
+                write(fd[1], matrixGroups->at(i).values[j].toString().c_str(), matrixGroups->at(i).values[j].toString().length());
+            }
+
             waitpid(pid, &status, 0);
 
-            if (WIFEXITED(status)) {
-                std::cout << "Child process exited with status " << WEXITSTATUS(status) << std::endl;
-            } else {
+            if (!WIFEXITED(status)) {
                 std::cerr << "Child process exited abnormally." << std::endl;
                 std::cout << "Aborting..." << std::endl;
                 exit(1);
@@ -137,7 +156,6 @@ void TesterModule::run() {
                 }
             }
 
-            // TODO: output
             std::cout << "Matrix group " << i << " is tested." << std::endl;
 
             this->logResult(SUM_TEST_1, actualSum12 == expectedSum12);

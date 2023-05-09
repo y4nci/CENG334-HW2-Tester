@@ -30,6 +30,9 @@ public:
     Matrix& operator=(const Matrix& matrix);
     std::vector<int>& operator[](int index);
     bool operator==(const Matrix& rhs);
+
+    // Utils
+    std::string toString();
 };
 
 typedef struct {

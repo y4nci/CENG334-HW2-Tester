@@ -33,6 +33,8 @@ int main(int argc, char** argv) {
 
     std::cout << infoMsg << std::endl;
 
+    printArguments(arguments);
+
     testerModule.confirmExecutable(executablePath);
 
     testerModule.initialiseEnvironment();

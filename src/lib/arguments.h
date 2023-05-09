@@ -19,5 +19,6 @@ struct Arguments {
 };
 
 Arguments parseArguments(int argc, char** argv);
+void printArguments(Arguments arguments);
 
 #endif //TESTER_HW2_ARGUMENTS_H

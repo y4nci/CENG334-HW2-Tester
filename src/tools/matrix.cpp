@@ -136,3 +136,19 @@ std::vector<MatrixGroup>* generateRandomMatrixGroups(unsigned matrixGroupCount, 
 
     return matrixGroups;
 }
+
+std::string Matrix::toString() {
+    std::string result = "";
+
+    result += std::to_string(this->matrixValues.size()) + " ";
+    result += std::to_string(this->matrixValues[0].size()) + "\n";
+
+    for (unsigned r = 0; r < this->matrixValues.size(); r++) {
+        for (unsigned c = 0; c < this->matrixValues[r].size(); c++) {
+            result += std::to_string(this->matrixValues[r][c]) + " ";
+        }
+        result += "\n";
+    }
+
+    return result;
+}
