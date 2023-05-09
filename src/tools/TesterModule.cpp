@@ -49,9 +49,7 @@ void TesterModule::run() {
         pid_t pid;
         int fd[2];
 
-        snprintf(outputPath, 24, "logs/output%d.txt", i);
-
-        // DEBUG
+        snprintf(outputPath, 24, "logs/output%d.txt", i+1);
 
         pipe(fd);
 
@@ -59,9 +57,15 @@ void TesterModule::run() {
 
         if (pid == 0) {
             // Child process
+            int outputFile = open(outputPath, O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
 
             close(fd[1]);
-            dup2(open(outputPath, O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU), STDOUT_FILENO);
+
+            if (outputFile == -1) {
+                exit(1);
+            }
+
+            dup2(outputFile, STDOUT_FILENO);
             dup2(fd[0], STDIN_FILENO);
             execl(executablePath, executablePath, NULL);
         } else if (pid > 0) {
