@@ -39,7 +39,7 @@ typedef struct {
     Matrix values [4];
 } MatrixGroup;
 
-MatrixGroup generateRandomMatrixGroup(unsigned rowCount, unsigned columnCount);
+MatrixGroup generateRandomMatrixGroup(unsigned N, unsigned M, unsigned K);
 
 std::vector<MatrixGroup>* generateRandomMatrixGroups(unsigned matrixGroupCount, int minDimension, int maxDimension);
 

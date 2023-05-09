@@ -96,25 +96,39 @@ bool Matrix::operator==(const Matrix& rhs) {
     return true;
 }
 
-MatrixGroup generateRandomMatrixGroup(unsigned rowCount, unsigned columnCount) {
+MatrixGroup generateRandomMatrixGroup(unsigned N, unsigned M, unsigned K) {
     MatrixGroup matrixGroup;
 
     std::random_device rd;
     std::mt19937 mt(rd());
     std::uniform_int_distribution<int> dist(0, 10);
 
-    for (int n = 0; n < 4; n++) {
+    for (int n = 0; n < 2; n++) {
         MatrixVector matrixValues;
 
-        for (int r = 0; r < rowCount; r++) {
+        for (int r = 0; r < N; r++) {
             std::vector<int> rowValues;
-            for (int c = 0; c < columnCount; c++) {
+            for (int c = 0; c < M; c++) {
                 rowValues.push_back(dist(mt));
             }
             matrixValues.push_back(rowValues);
         }
 
-        matrixGroup.values[n] = Matrix(rowCount, columnCount, matrixValues);
+        matrixGroup.values[n] = Matrix(N, M, matrixValues);
+    }
+
+    for (int n = 0; n < 2; n++) {
+        MatrixVector matrixValues;
+
+        for (int r = 0; r < M; r++) {
+            std::vector<int> rowValues;
+            for (int c = 0; c < K; c++) {
+                rowValues.push_back(dist(mt));
+            }
+            matrixValues.push_back(rowValues);
+        }
+
+        matrixGroup.values[n + 2] = Matrix(M, K, matrixValues);
     }
 
     return matrixGroup;
@@ -128,10 +142,11 @@ std::vector<MatrixGroup>* generateRandomMatrixGroups(unsigned matrixGroupCount, 
     std::uniform_int_distribution<int> dist(minDimension, maxDimension);
 
     for (int n = 0; n < matrixGroupCount; n++) {
-        int rowCount = dist(mt);
-        int columnCount = dist(mt);
+        unsigned N = dist(mt);
+        unsigned M = dist(mt);
+        unsigned K = dist(mt);
 
-        matrixGroups->push_back(generateRandomMatrixGroup(rowCount, columnCount));
+        matrixGroups->push_back(generateRandomMatrixGroup(N, M, K));
     }
 
     return matrixGroups;
