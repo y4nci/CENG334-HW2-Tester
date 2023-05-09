@@ -26,6 +26,7 @@ Arguments parseArguments(int argc, char** argv) {
                          "If no arguments are given, the default values are used.\n"
                          "\n"
                          "Report bugs to baran.yanci@metu.edu.tr" << "\n";
+            exit(0);
         } else {
             std::cout << "Usage: " << argv[0] << " <matrixGroupCount> <minDimension> <maxDimension>" << std::endl;
             exit(1);

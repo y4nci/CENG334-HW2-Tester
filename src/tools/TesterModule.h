@@ -6,45 +6,24 @@
 #define TESTER_HW2_TESTERMODULE_H
 
 #include "matrix.h"
-#include "lib/arguments.h"
+#include "../lib/arguments.h"
 
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/fcntl.h>
 
-enum class TestResult {
-    FAILURE,
-    SUCCESS
-};
-
-enum class TestType {
-    MATRIX,
-    THREAD_COUNT,
-    THREAD_ORDERING
-};
-
-union TestResultData {
-    /**
-     * @param first: expected result
-     * @param second: actual result
-     */
-    std::pair<Matrix*, Matrix*> matrices;
-
-    /**
-     * @param first: expected count
-     * @param second: actual count
-     */
-    std::pair<int, int> thread_counts;
-
-    /**
-     * @param first: expected number of first-multiplier-then-adder instances
-     * @param second: actual number of first-multiplier-then-adder instances
-     */
-    std::pair<int, int> threadOrdering;
-};
+#define SUM_TEST_1 "SUM OF MATRICES A&B"
+#define SUM_TEST_2 "SUM OF MATRICES C&D"
+#define MATCHING_OUTPUTS "MATCHING OUTPUT MATRICES"
+#define FINAL_MATRIX "FINAL MATRIX"
+#define THREAD_COUNT "THREAD COUNT"
+#define SUM_THREAD_SYNCHRONISATION "THREAD SYNCHRONISATION BETWEEN SUM THREADS"
+#define MUL_THREAD_SYNCHRONISATION "THREAD SYNCHRONISATION BETWEEN MUL THREADS AND SUM THREADS"
 
 class TesterModule {
 private:
+    bool sumSyncDetected;
+    bool mulSyncDetected;
     Arguments arguments;
     std::vector<MatrixGroup>* matrixGroups;
 public:
@@ -55,6 +34,7 @@ public:
     void initialiseEnvironment();
     void confirmExecutable(const char* executablePath);
     void run();
+    void logResult(const char* title, bool passed);
 };
 
 #endif //TESTER_HW2_TESTERMODULE_H

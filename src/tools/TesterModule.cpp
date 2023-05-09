@@ -26,7 +26,13 @@ void TesterModule::confirmExecutable(const char* executablePath) {
 }
 
 void TesterModule::initialiseEnvironment() {
+    this->sumSyncDetected = false;
+    this->mulSyncDetected = false;
     this->matrixGroups = generateRandomMatrixGroups(arguments.matrixGroupCount, arguments.minDimension, arguments.maxDimension);
+}
+
+void TesterModule::logResult(const char* title, bool passed) {
+    std::cout << title << ": " << (passed ? "PASSED" : "FAILED") << std::endl;
 }
 
 void TesterModule::run() {
@@ -36,22 +42,30 @@ void TesterModule::run() {
         char outputPath[16];
         pid_t pid = fork();
 
-        snprintf(outputPath, 16, "./output%d.txt", i);
+        snprintf(outputPath, 16, "./logs/output%d.txt", i);
 
         if (pid == 0) {
             // Child process
+
             dup2(open(outputPath, O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU), STDOUT_FILENO);
             execl(executablePath, executablePath, NULL);
         } else if (pid > 0) {
             // Parent process
-            int status, threadLines = 0;
+
+            int status, threadLines = 0, lastMatrixId = INT_MIN;
             unsigned finalRow = matrixGroups->at(i).values[0].getMatrixValues().size()
-                    , finalColumn = matrixGroups->at(i).values[3].getMatrixValues()[0].size();
+                    , finalColumn = matrixGroups->at(i).values[3].getMatrixValues()[0].size()
+                    , N = finalRow, K = finalColumn, M = matrixGroups->at(i).values[0].getMatrixValues()[0].size();
             FILE *outputFile;
             Matrix expectedSum12 = matrixGroups->at(i).values[0] + matrixGroups->at(i).values[1]
                     , expectedSum34 = matrixGroups->at(i).values[2] + matrixGroups->at(i).values[3]
                     , expectedFinal = expectedSum12 * expectedSum34
-                    , actualSum12, actualSum34, actualFinal;
+                    , actualSum12, actualSum34
+
+                    /* actualFinal_cellByCell is a matrix containing the values it read from the outputs of the threads.
+                     * whereas actualFinal_output is a matrix containing the values it read from the end of the output file.
+                     */
+                    , actualFinal_cellByCell, actualFinal_output;
 
             waitpid(pid, &status, 0);
 
@@ -94,7 +108,15 @@ void TesterModule::run() {
                     } else if (matrixId == 1) {
                         actualSum34[x][y] = value;
                     } else if (matrixId == 2) {
-                        actualFinal[x][y] = value;
+                        actualFinal_cellByCell[x][y] = value;
+                    }
+
+                    if (lastMatrixId == 2 && matrixId != 2) {
+                        this->mulSyncDetected = true;
+                    } else if (lastMatrixId == 1 && matrixId == 0) {
+                        this->sumSyncDetected = true;
+                    } else {
+                        lastMatrixId = matrixId;
                     }
 
                     threadLines++;
@@ -109,16 +131,30 @@ void TesterModule::run() {
                         fgets(rowString, 64, outputFile);
 
                         for (char *token = strtok(rowString, " "); token != NULL; token = strtok(NULL, " ")) {
-                            actualFinal[row][column++] = atoi(token);
+                            actualFinal_output[row][column++] = atoi(token);
                         }
                     }
                 }
             }
 
             // TODO: output
+            std::cout << "Matrix group " << i << " is tested." << std::endl;
+
+            this->logResult(SUM_TEST_1, actualSum12 == expectedSum12);
+            this->logResult(SUM_TEST_2, actualSum34 == expectedSum34);
+            this->logResult(MATCHING_OUTPUTS, actualFinal_cellByCell == actualFinal_output);
+            this->logResult(FINAL_MATRIX, actualFinal_output == expectedFinal);
+
+            this->logResult(THREAD_COUNT, threadLines == 2 * N + M);
+
+            fclose(outputFile);
+            system("rm -f logs/output*.txt");
         } else {
             std::cerr << "Fork failed." << std::endl;
             exit(1);
         }
     }
+
+    this->logResult(SUM_THREAD_SYNCHRONISATION, this->sumSyncDetected);
+    this->logResult(MUL_THREAD_SYNCHRONISATION, this->mulSyncDetected);
 }
