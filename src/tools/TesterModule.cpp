@@ -88,7 +88,7 @@ void TesterModule::run() {
                      * whereas actualFinal_output is a matrix containing the values it read from the end of the output file.
                      */
                     , actualFinal_cellByCell(N, K, 0), actualFinal_output(N, K, 0);
-            std::vector<std::string> threadIds;
+            std::vector<std::string> threadIdsM0, threadIdsM1, threadIdsM2;
 
             close(fd[0]);
 
@@ -106,7 +106,9 @@ void TesterModule::run() {
                 this->logResult(SUM_TEST_2, false);
                 this->logResult(MATCHING_OUTPUTS, false);
                 this->logResult(FINAL_MATRIX, false);
-                this->logResult(THREAD_COUNT, false);
+                this->logResult(M0_THREAD_COUNT, false);
+                this->logResult(M1_THREAD_COUNT, false);
+                this->logResult(M2_THREAD_COUNT, false);
                 std::cout << "----------------------------------------" << std::endl;
                 continue;
             }
@@ -142,10 +144,13 @@ void TesterModule::run() {
 
                     if (matrixId == 0) {
                         actualSum12[x-1][y-1] = value;
+                        threadIdsM0.push_back(id);
                     } else if (matrixId == 1) {
                         actualSum34[x-1][y-1] = value;
+                        threadIdsM1.push_back(id);
                     } else if (matrixId == 2) {
                         actualFinal_cellByCell[x-1][y-1] = value;
+                        threadIdsM2.push_back(id);
                     }
 
                     if (lastMatrixId == 2 && matrixId != 2) {
@@ -155,8 +160,6 @@ void TesterModule::run() {
                     } else {
                         lastMatrixId = matrixId;
                     }
-
-                    threadIds.push_back(id);
                 } else {
                     // parse final matrix
                     // row by row
@@ -184,8 +187,9 @@ void TesterModule::run() {
             this->logResult(SUM_TEST_1, actualSum12 == expectedSum12);
             this->logResult(SUM_TEST_2, actualSum34 == expectedSum34);
             this->logResult(MATCHING_OUTPUTS, actualFinal_cellByCell == actualFinal_output);
-
-            this->logResult(THREAD_COUNT, std::set<std::string>( threadIds.begin(), threadIds.end() ).size() == 2 * N + M);
+            this->logResult(M0_THREAD_COUNT, std::set<std::string>( threadIdsM0.begin(), threadIdsM0.end() ).size() == N);
+            this->logResult(M1_THREAD_COUNT, std::set<std::string>( threadIdsM1.begin(), threadIdsM1.end() ).size() == M);
+            this->logResult(M2_THREAD_COUNT, std::set<std::string>( threadIdsM2.begin(), threadIdsM2.end() ).size() == N);
 
             std::cout << "----------------------------------------" << std::endl;
 
