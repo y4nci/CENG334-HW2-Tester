@@ -17,8 +17,8 @@
 
 ## What It Is
 
-This tester is a program which merely checks the basics like the arithmetic results and thread counts.
+This tester is a program which merely checks the basics like the arithmetic results and thread counts. This is only for your convenience and to give you an idea about what could go wrong during the evaluation of your code. You are encouraged to test the generated input matrices on your code manually.
 
 ## What It Is Not
 
-This tester, in any way, is not an official tester, and the result produced by this tester is not guaranteed to be correct. This tester is only for your convenience and to give you an idea about what could go wrong during the evaluation of your code.
+This tester, in any way, is not an official tester, and the result produced by this tester is not guaranteed to be correct. Moreover, this tester does not test certain situations and conditions (like unnecessary waiting etc.)
