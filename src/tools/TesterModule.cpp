@@ -138,9 +138,9 @@ void TesterModule::run(int testNumber) {
         // the counts of such lines should be equal to the total number of cells in the matrices.
 
         while (!feof(outputFile) && row < finalRow) {
-            char line[64];
+            char line[256];
 
-            fgets(line, 64, outputFile);
+            fgets(line, 256, outputFile);
 
             if (line[0] == 't') {
                 char id[64]; // TODO: use this id to check whether a row is actually computed by the thread that is supposed to compute it.
