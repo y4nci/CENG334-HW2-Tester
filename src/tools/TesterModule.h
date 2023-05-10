@@ -30,6 +30,7 @@
 
 class TesterModule {
 private:
+    bool allTestsPassed;
     bool sumSyncDetected;
     bool mulSyncDetected;
     Arguments arguments;
@@ -42,7 +43,7 @@ public:
     void initialiseEnvironment();
     void confirmExecutable(const char* executablePath);
     void run();
-    void logResult(const char* title, bool passed);
+    void evaluate(const char* title, bool passed);
     bool parseThreadString(const char* str, int& t, char* id, int& matrix_id, int& x, int& y, int& value);
 };
 

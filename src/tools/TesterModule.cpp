@@ -16,7 +16,12 @@ TesterModule::TesterModule(Arguments arguments) {
 TesterModule::~TesterModule() {
     delete this->matrixGroups;
 
-    system("rm -f logs/output*.txt");
+    if (this->allTestsPassed) {
+        std::cout << "All tests passed." << std::endl;
+    } else {
+        std::cout << "Some tests failed." << std::endl;
+        std::cout << "You can see the outputs your code produced by looking at 'output{test case #}.txt'." << std::endl;
+    }
 }
 
 void TesterModule::confirmExecutable(const char* executablePath) {
@@ -32,13 +37,18 @@ void TesterModule::confirmExecutable(const char* executablePath) {
 void TesterModule::initialiseEnvironment() {
     this->sumSyncDetected = false;
     this->mulSyncDetected = false;
+    this->allTestsPassed = true;
     this->matrixGroups = generateRandomMatrixGroups(arguments.matrixGroupCount, arguments.minDimension, arguments.maxDimension);
 
     std::cout << "Environment initialised." << std::endl;
 }
 
-void TesterModule::logResult(const char* title, bool passed) {
+void TesterModule::evaluate(const char* title, bool passed) {
     std::cout << title << ": " << (passed ? "PASSED" : "FAILED") << std::endl;
+
+    if (!passed) {
+        this->allTestsPassed = false;
+    }
 }
 
 void TesterModule::run() {
@@ -102,13 +112,13 @@ void TesterModule::run() {
 
             if (!WIFEXITED(status)) {
                 std::cerr << "Child process exited abnormally." << std::endl;
-                this->logResult(SUM_TEST_1, false);
-                this->logResult(SUM_TEST_2, false);
-                this->logResult(MATCHING_OUTPUTS, false);
-                this->logResult(FINAL_MATRIX, false);
-                this->logResult(M0_THREAD_COUNT, false);
-                this->logResult(M1_THREAD_COUNT, false);
-                this->logResult(M2_THREAD_COUNT, false);
+                this->evaluate(SUM_TEST_1, false);
+                this->evaluate(SUM_TEST_2, false);
+                this->evaluate(MATCHING_OUTPUTS, false);
+                this->evaluate(FINAL_MATRIX, false);
+                this->evaluate(M0_THREAD_COUNT, false);
+                this->evaluate(M1_THREAD_COUNT, false);
+                this->evaluate(M2_THREAD_COUNT, false);
                 std::cout << "----------------------------------------" << std::endl;
                 continue;
             }
@@ -183,13 +193,13 @@ void TesterModule::run() {
             std::cout << "Expected final matrix:\n" << expectedFinal.toString() << std::endl;
             std::cout << "Actual final matrix:\n" << actualFinal_output.toString() << std::endl;
 
-            this->logResult(FINAL_MATRIX, actualFinal_output == expectedFinal);
-            this->logResult(SUM_TEST_1, actualSum12 == expectedSum12);
-            this->logResult(SUM_TEST_2, actualSum34 == expectedSum34);
-            this->logResult(MATCHING_OUTPUTS, actualFinal_cellByCell == actualFinal_output);
-            this->logResult(M0_THREAD_COUNT, std::set<std::string>( threadIdsM0.begin(), threadIdsM0.end() ).size() == N);
-            this->logResult(M1_THREAD_COUNT, std::set<std::string>( threadIdsM1.begin(), threadIdsM1.end() ).size() == M);
-            this->logResult(M2_THREAD_COUNT, std::set<std::string>( threadIdsM2.begin(), threadIdsM2.end() ).size() == N);
+            this->evaluate(FINAL_MATRIX, actualFinal_output == expectedFinal);
+            this->evaluate(SUM_TEST_1, actualSum12 == expectedSum12);
+            this->evaluate(SUM_TEST_2, actualSum34 == expectedSum34);
+            this->evaluate(MATCHING_OUTPUTS, actualFinal_cellByCell == actualFinal_output);
+            this->evaluate(M0_THREAD_COUNT, std::set<std::string>( threadIdsM0.begin(), threadIdsM0.end() ).size() == N);
+            this->evaluate(M1_THREAD_COUNT, std::set<std::string>( threadIdsM1.begin(), threadIdsM1.end() ).size() == M);
+            this->evaluate(M2_THREAD_COUNT, std::set<std::string>( threadIdsM2.begin(), threadIdsM2.end() ).size() == N);
 
             std::cout << "----------------------------------------" << std::endl;
 
@@ -201,8 +211,8 @@ void TesterModule::run() {
     }
 
     std::cout << "\nThe test process is finished." << std::endl;
-    this->logResult(SUM_THREAD_SYNCHRONISATION, this->sumSyncDetected);
-    this->logResult(MUL_THREAD_SYNCHRONISATION, this->mulSyncDetected);
+    this->evaluate(SUM_THREAD_SYNCHRONISATION, this->sumSyncDetected);
+    this->evaluate(MUL_THREAD_SYNCHRONISATION, this->mulSyncDetected);
 
     if (!this->sumSyncDetected || !this->mulSyncDetected) {
         char infoMsg [] = "\tNote that these two units check whether two instances of additions occured concurrently "
