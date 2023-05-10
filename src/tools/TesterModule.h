@@ -42,9 +42,10 @@ public:
 
     void initialiseEnvironment();
     void confirmExecutable(const char* executablePath);
-    void run();
+    void run(int testNumber);
     void evaluate(const char* title, bool passed);
     bool parseThreadString(const char* str, int& t, char* id, int& matrix_id, int& x, int& y, int& value);
+    void endTest();
 };
 
 #endif //TESTER_HW2_TESTERMODULE_H
