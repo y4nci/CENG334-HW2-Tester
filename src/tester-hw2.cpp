@@ -50,7 +50,10 @@ int main(int argc, char** argv) {
 
     testerModule.initialiseEnvironment();
 
-    testerModule.run();
+    for (int i = 0; i < arguments.matrixGroupCount; i++)
+        testerModule.run(i);
+
+    testerModule.endTest();
 
     return 0;
 }
