@@ -20,7 +20,7 @@ TesterModule::~TesterModule() {
         std::cout << "All tests passed." << std::endl;
     } else {
         std::cout << "Some tests failed." << std::endl;
-        std::cout << "You can see the outputs your code produced by looking at 'output{test case #}.txt'." << std::endl;
+        std::cout << "You can see the outputs your code produced by looking at 'logs/output{test case #}.txt'." << std::endl;
     }
 }
 
@@ -153,13 +153,25 @@ void TesterModule::run() {
                     }
 
                     if (matrixId == 0) {
-                        actualSum12[x-1][y-1] = value;
+                        if (x > N || y > M) {
+                            std::cerr << "Matrix0 is out of bounds." << std::endl;
+                        } else {
+                            actualSum12[x-1][y-1] = value;
+                        }
                         threadIdsM0.push_back(id);
                     } else if (matrixId == 1) {
-                        actualSum34[x-1][y-1] = value;
+                        if (x > M || y > K) {
+                            std::cerr << "Matrix1 is out of bounds." << std::endl;
+                        } else {
+                            actualSum34[x-1][y-1] = value;
+                        }
                         threadIdsM1.push_back(id);
                     } else if (matrixId == 2) {
-                        actualFinal_cellByCell[x-1][y-1] = value;
+                        if (x > N || y > K) {
+                            std::cerr << "Matrix2 is out of bounds." << std::endl;
+                        } else {
+                            actualFinal_cellByCell[x-1][y-1] = value;
+                        }
                         threadIdsM2.push_back(id);
                     }
 
