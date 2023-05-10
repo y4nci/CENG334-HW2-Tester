@@ -18,6 +18,7 @@ TesterModule::~TesterModule() {
 
     if (this->allTestsPassed) {
         std::cout << "All tests passed." << std::endl;
+        system("rm -rf logs/output*.txt");
     } else {
         std::cout << "Some tests failed." << std::endl;
         std::cout << "You can see the outputs your code produced by looking at 'logs/output{test case #}.txt'." << std::endl;
