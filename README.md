@@ -1,11 +1,17 @@
 # CENG334 HW2 Tester
 
+See and create [issues](https://github.com/y4nci/CENG334-HW2-Tester/issues) about this tester.
+
 ## To Execute
 
  - Put your `hw2` executable in the root folder of this tester
  - `make`
  - `./tester-hw2`
-     - You can learn more about this command by typing `./tester-hw2 -h` or `./tester-hw2 --help` 
+     - Another usage is `./tester-hw2 <test case count> <minimum dimension of matrices> <maximum dimension of matrices>`
+         - `test case count`: The number of test cases. I suggest to keep this number between 1-10, as going higher causes memory errors currently.
+         - `minimum dimension of matrices`: The minimum dimension of generated matrices. Does not guarantee that a matrix having this number as a dimension is going to be generated, this number just provides a lower bound for randomly generated dimensions.
+         - `maximum dimension of matrices`: The maximum dimension of generated matrices. Does not guarantee that a matrix having this number as a dimension is going to be generated, this number just provides an upper bound for randomly generated dimensions.
+     - To learn more about this command, type `./tester-hw2 -h` or `./tester-hw2 --help` 
 
 ## INFORMATION ABOUT TEST UNITS:
 
