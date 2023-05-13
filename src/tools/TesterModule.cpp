@@ -108,6 +108,7 @@ void TesterModule::run(int testNumber) {
             write(fd[1], matrixGroups->at(testNumber).values[j].toString().c_str(), matrixGroups->at(testNumber).values[j].toString().length());
         }
 
+        close(fd[1]);
         waitpid(pid, &status, 0);
 
         if (!WIFEXITED(status)) {
@@ -195,8 +196,6 @@ void TesterModule::run(int testNumber) {
                 row++;
             }
         }
-
-        close(fd[1]);
 
         std::cout << "\nMatrix group " << testNumber+1 << " is tested.\n\n" << std::endl;
 
